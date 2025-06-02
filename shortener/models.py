@@ -11,6 +11,7 @@ class ShortURL(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     expire_at = models.DateTimeField()
+    click_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.short_code} -> {self.original_url}"
