@@ -192,3 +192,7 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# To-Do List
+#  This section is for tracking tasks or items that need attention.
+To-Do.md
