@@ -2,6 +2,10 @@ from django.db import models
 
 # Create your models here.
 class ShortURL(models.Model):
+    """
+    Model representing a shortened URL.
+    
+    """
     original_url = models.URLField()
     short_code = models.CharField(max_length=20, unique=True)
     is_active = models.BooleanField(default=True)
@@ -10,6 +14,6 @@ class ShortURL(models.Model):
 
     def __str__(self):
         return f"{self.short_code} -> {self.original_url}"
-    
+
     def is_expired(self):
         return timezone.now() > self.expire_at
