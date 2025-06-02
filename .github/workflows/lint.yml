@@ -22,4 +22,4 @@ jobs:
 
       - name: Run pylint
         run: |
-          pylint shortener url_shortener manage.py
+          pylint shortener config manage.py
