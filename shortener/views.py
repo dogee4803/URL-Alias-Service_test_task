@@ -34,7 +34,7 @@ class CreateShortURL(APIView):
                 'short_url': request.build_absolute_uri(f'/{short_url.short_code}/')
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
+
 
 class URLListView(APIView):
     """
@@ -60,8 +60,14 @@ class DeactivateURL(APIView):
     authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, pk=None):
-        return Response({"message": "DeactivateURL works"}, status=status.HTTP_200_OK)
+    def post(self, request, short_code):
+        try:
+            short_url = ShortURL.objects.get(short_code=short_code)
+        except ShortURL.DoesNotExist:
+            return Response({"error": "Short URL not found"}, status=status.HTTP_404_NOT_FOUND)
+        short_url.is_active = False
+        short_url.save()
+        return Response({"message": "Short URL deactivated"}, status=status.HTTP_200_OK)
 
 
 class RedirectToOriginalView(APIView):
@@ -73,9 +79,23 @@ class RedirectToOriginalView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, short_code):
+        try:
+            short_url = ShortURL.objects.get(short_code=short_code)
+        except ShortURL.DoesNotExist:
+            return Response({"error": "Short URL not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        original_url = "https://example.com"
+        if not short_url.is_actual:
+            if short_url.is_active and short_url.is_expired():
+                short_url.is_active = False
+                short_url.save(update_fields=['is_active'])
+            return Response(
+                    {"error": "Short URL is inactive or expired"},
+                    status=status.HTTP_410_GONE)
 
-        if original_url:
-            return HttpResponseRedirect(original_url)
-        raise Http404("URL not found")
+        short_url.click_count += 1
+        short_url.save()
+
+        return Response(
+                {"original_url": short_url.original_url},
+                status=status.HTTP_302_FOUND,
+                headers={"Location": short_url.original_url})

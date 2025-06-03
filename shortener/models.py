@@ -36,3 +36,7 @@ class ShortURL(models.Model):
 
     def is_expired(self):
         return timezone.now() > self.expire_at
+
+    @property
+    def is_actual(self):
+        return self.is_active and not self.is_expired()

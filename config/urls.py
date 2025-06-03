@@ -22,6 +22,9 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from shortener import views
+from shortener.views import RedirectToOriginalView
+
 SchemaView = get_schema_view(
     openapi.Info(
         title="URL Alias Service API",
@@ -34,6 +37,7 @@ SchemaView = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('shortener.urls')),
     path('docs/', SchemaView.with_ui('swagger', cache_timeout=0)),
+    path('api/', include('shortener.urls')),
+    path('<str:short_code>/', views.RedirectToOriginalView.as_view(), name='redirect-to-original'),
 ]
