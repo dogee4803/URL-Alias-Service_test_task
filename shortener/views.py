@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import BasicAuthentication
 
 from .models import ShortURL
-from .serializers import ShortURLCreateSerializer
+from .serializers import ShortURLCreateSerializer, ShortURLListSerializer
 
 # Create your views here.
 
@@ -46,7 +46,9 @@ class URLListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return Response({"message": "URLListView works"}, status=status.HTTP_200_OK)
+        url = ShortURL.objects.all()
+        serializer = ShortURLListSerializer(url, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class DeactivateURL(APIView):
