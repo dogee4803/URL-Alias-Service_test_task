@@ -5,6 +5,9 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import BasicAuthentication
 
+from .models import ShortURL
+from .serializers import ShortURLCreateSerializer
+
 # Create your views here.
 
 class CreateShortURL(APIView):
@@ -17,8 +20,21 @@ class CreateShortURL(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        return Response({"message": "CreateShortURL works"}, status=status.HTTP_200_OK)
-
+        serializer = ShortURLCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            original_url = serializer.validated_data['original_url']
+            short_code = ShortURL.generate_unique_short_code()
+            short_url = ShortURL.objects.create(
+                original_url=original_url,
+                short_code=short_code
+            )
+            return Response({
+                'original_url': short_url.original_url,
+                'short_code': short_url.short_code,
+                'short_url': request.build_absolute_uri(f'/{short_url.short_code}/')
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
 
 class URLListView(APIView):
     """

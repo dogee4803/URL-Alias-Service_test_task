@@ -30,7 +30,7 @@ class ShortURL(models.Model):
     def generate_unique_short_code(length = 8):
         characters = string.ascii_letters + string.digits
         while True:
-            short_code = ''.join(random.choice(characters, k=length))
+            short_code = ''.join(random.choices(characters, k=length))
             if not ShortURL.objects.filter(short_code=short_code).exists():
                 return short_code
 
