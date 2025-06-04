@@ -51,7 +51,7 @@ make lint
 - **GET /docs/** — Swagger документация
 - **GET /<short_code>/** — редирект на оригинальный URL (публично)
 - **POST /api/create/** — создать короткую ссылку (требует Basic Auth)
-- **GET /api/list/** — список всех ссылок (требует Basic Auth)
+- **GET /api/list/** — список всех ссылок с пагинацией по 2 (требует Basic Auth)
 - **POST /api/deactivate/<short_code>/** — деактивировать ссылку (требует Basic Auth)
 - **GET /api/stats/** — статистика по всем ссылкам (требует Basic Auth)
 
