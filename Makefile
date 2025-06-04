@@ -4,7 +4,7 @@ else
     ACTIVATE = source venv/bin/activate
 endif
 
-.PHONY: venv install migrate createsuperuser run lint test
+.PHONY: venv install migrate createsuperuser run lint
 
 venv:
     python -m venv venv
