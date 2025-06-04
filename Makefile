@@ -10,7 +10,7 @@ venv:
 	python -m venv venv
 
 install: venv
-	$(ACTIVATE) && pip install --upgrade pip && pip install -r requirements.txt
+	$(ACTIVATE) && python -m pip install --upgrade pip && pip install -r requirements.txt
 
 migrate:
 	$(ACTIVATE) && python manage.py migrate
