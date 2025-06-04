@@ -5,8 +5,8 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import BasicAuthentication
 
-from .models import ShortURL
-from .serializers import ShortURLCreateSerializer, ShortURLListSerializer
+from .models import ShortURL, Click
+from .serializers import ShortURLCreateSerializer, ShortURLListSerializer, ShortURLStatsSerializer
 
 # Create your views here.
 
@@ -91,11 +91,29 @@ class RedirectToOriginalView(APIView):
             return Response(
                     {"error": "Short URL is inactive or expired"},
                     status=status.HTTP_410_GONE)
-
-        short_url.click_count += 1
+        
+        Click.objects.create(short_url=short_url)
+        
         short_url.save()
 
         return Response(
                 {"original_url": short_url.original_url},
                 status=status.HTTP_302_FOUND,
                 headers={"Location": short_url.original_url})
+
+
+class GlobalStatsView(APIView):
+    """
+    API endpoint for retrieving global statistics of all short URLs.
+    
+    """
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Получаем все ссылки и сортируем по total_clicks (сначала самые популярные)
+        urls = list(ShortURL.objects.all())
+        urls.sort(key=lambda url: url.total_clicks(), reverse=True)
+        serializer = ShortURLStatsSerializer(urls, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+

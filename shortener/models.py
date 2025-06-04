@@ -21,7 +21,6 @@ class ShortURL(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     expire_at = models.DateTimeField(default=default_expire_at)
-    click_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.short_code} -> {self.original_url}"
@@ -40,3 +39,27 @@ class ShortURL(models.Model):
     @property
     def is_actual(self):
         return self.is_active and not self.is_expired()
+    
+    # Statistics methods
+    def clicks_last_hour(self):
+        one_hour_ago = timezone.now() - timedelta(hours=1)
+        return self.clicks.filter(clicked_at__gte=one_hour_ago).count()
+
+    def clicks_last_day(self):
+        one_day_ago = timezone.now() - timedelta(days=1)
+        return self.clicks.filter(clicked_at__gte=one_day_ago).count()
+
+    def total_clicks(self):
+        return self.clicks.count()
+    
+    
+class Click(models.Model):
+    """
+    Model representing a click on a shortened URL.
+    
+    """
+    short_url = models.ForeignKey(ShortURL, related_name='clicks', on_delete=models.CASCADE)
+    clicked_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Click on {self.short_url.short_code} at {self.clicked_at}"
