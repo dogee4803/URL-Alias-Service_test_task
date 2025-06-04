@@ -6,7 +6,6 @@ from django.utils import timezone
 
 
 def default_expire_at():
-    # todo: Посмотреть, возможно ли использовать lambda-функцию для установки значения по умолчанию
     return timezone.now() + timedelta(days=1)
 
 
@@ -39,7 +38,7 @@ class ShortURL(models.Model):
     @property
     def is_actual(self):
         return self.is_active and not self.is_expired()
-    
+
     # Statistics methods
     def clicks_last_hour(self):
         one_hour_ago = timezone.now() - timedelta(hours=1)
@@ -51,8 +50,8 @@ class ShortURL(models.Model):
 
     def total_clicks(self):
         return self.clicks.count()
-    
-    
+
+
 class Click(models.Model):
     """
     Model representing a click on a shortened URL.
